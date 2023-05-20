@@ -1,0 +1,460 @@
+
+Aufgaben zum ‚bersetzerbau-Praktikum
+Sommersemester 2003 
+  
+  Berthold Hoffmann und G…nter Feldmann
+  Studiengang Informatik der Universitƒt Bremen
+
+
+Zusammenfassung
+
+ Gegeben: Ein PL0-System. bestehend aus dem ‚bersetzer von PL0 in die Maschinensprache eines abstrakten RISC Prozessors, und ein
+Emulator des Prozessors mit einfachen Debug M„glichkeiten. 
+
+ Aufgabe:  Ausbau des PL0-‚bersetzers: 
+
+Die Quellsprache PL0 soll erweitert werden (u.A. um Typ-Vereinbarungen, Feld-Vereinbarungen, Prozeduren mit Parametern, geklammerte
+Anweisungen, logische Ausdr…cke); die resultierende Sprache wird PL5 genannt.
+
+Einige Algorithmen des ‚bersetzers sollen verbessert werden, u.a. die Verwaltung von Bezeichnern und Vereinbarungen.
+
+ Validation: Die ‚berpr…fung der Funktionsweise des PL5-‚bersetzers geschieht am Ende des Semesters mit einem (ebenfalls vorgegebenen)
+Satz von Test-Programmen. Die Zwischenschritte (PL1 bis PL4) sind freiwillig.
+
+
+Vorgehensweise
+
+ Die Aufgabe erscheint uns zu umfangreich, um auf einen Schlag gel„st zu werden. Es bieten sich prinzipiell zwei Aufteilungen an:
+  
+ schrittweise:  die Spracherweiterungen und Verbesserungen nach und nach einf…gen.
+
+ phasenweise:  die Phasen der ‚bersetzung nacheinander von PL0 auf PL5 erweitern.
+
+ Die erste M„glichkeit hat den Vorteil, da– man zwischendurch immer wieder einen leicht zu "validierenden" ‚bersetzer hat, wobei man
+allerdings einige Moduln des ‚bersetzers mehrmals erweitern mu–. Mit der zweiten Methode vermeidet man diese Mehrarbeit, hat aber
+mehr Probleme, die Moduln einzeln zu testen.
+
+ Wir schlagen vor, schrittweise vorzugehen, und haben im folgenden Teilsprachen PL1 bis PL5 definiert und Anforderungen an ihre ‚bersetzer
+formuliert. Dabei haben wir versucht, die oben erwƒhnte Mehrarbeit im ertrƒglichen Rahmen zu halten.
+
+ Werden die Aufgaben in der angegebenen Reihenfolge bearbeitet, so ist sichergestellt, da– in der Vorlesung die ben„tigten Grundlagen schon
+behandelt wurden.
+
+
+Vorgaben
+
+ Die Quellen des PL0-Systems werden zur Verf…gung gestellt. Das System ist in der Sprache Oberon geschrieben und lƒuft auf dem ETH 
+Oberon System. Dieses System steht als natives System f…r Intel PCs sowie als Gastsystem f…r folgende Systeme zur Verf…gung: Windows NT,
+Windows 2000, Apple Macintosh, Linux f…r Intel PCs, Linux f…r PowerPCs, Solaris f…r Intel PCs sowie Solaris SPARC. Wer also zu Hause arbeiten
+m„chte es nicht bereits hat, kann es sich …ber das Internet von folgendem Server herunter laden:
+  
+  http://www.oberon.ethz.ch
+        
+ Auf den Solaris- und Linux Arbeitsplatzrechnern des Fachbereichs ist es bereits fertig installiert und kann einfach durch das Kommando
+oberon gestartet werden.
+
+ Zusammen mit dem PL0 System werden noch (fehlerhafte und lauffƒhige) Testprogramme f…r die verschiedenen Erweiterungen des PL0-
+Compilers zur Verf…gung gestellt. 
+
+Scheine
+
+ Alle, die mindestens PL4 implementiert haben, bekommen einen Schein. Die Zwischenergebnisse der Aufgaben 0 bis 4 brauchen nicht abge-
+geben zu werden (damit wir sie auch nicht nachsehen m…ssen!).
+
+
+Aufgabe 0: Schnupperkurs in PL0
+
+ Um eine Sprache zu implementieren, mu– man sie gut kennen, genauso wie das System. Das gleiche gilt f…r einen ‚bersetzer, wenn man
+ihn erweitern soll. Hierzu dient diese Aufgabe.
+
+ Installiert das Oberon- und das PL0-System auf Eurem PC (bzw., wenn Ihr auf UNIX-Rechnern arbeiten wollt: loggt Euch ein). La–t das
+PL0-System mit einigen Testprogrammen laufen, richtige und fehlerhafte und beobachtet das Verhalten des Systems.
+
+ Schreibt dann mindestens zwei "sinnvolle" PL0-Programme, z.B.:
+  
+ Gr„–ter gemeinsamer Teiler zweier positiver Zahlen.
+
+ Division von ganzen Zahlen, aufbauend auf der Multiplikation mit und Division durch 2 (Links- und Rechts- Shift).
+
+ Berechnung der Fakultƒt.
+
+ Bestimmung des Maximums und Minimums in einer Folge von Zahlen.
+
+ La–t diese Programme …bersetzen und f…hrt sie aus. Seht Euch die Liste des Quellprogramms, die "traces" der drei Compilations-
+phasen und den produzierten RISC-Code an.
+
+ K…r:  Wer beim Benutzen des PL0-Systems unregelmƒ–iges Verhalten feststellt, d.h. einen "compiler error" hervorruft oder feststellen
+mu–, da– die Programmausf…hrung inkorrekte Ergebnisse liefert, bekommt von G…nter eine Belohnung in Form eines gesundheits-
+schƒdlichen Genu–mittels (wahlweise Zigarette oder Schokoku–).
+
+
+
+Aufgabe 1:  Lexikalische Analyse
+
+ Im Vorgriff auf epochemachende Umwƒlzungen im PL0-System soll ein PL1-‚bersetzer entwickelt werden, der …ber eine leistungsfƒhige
+lexikalische Analyse verf…gt und alle die Lexeme erkennt, die f…r zuk…nftige Spracherweiterungen ben„tigt werden. In PL1 soll au–erdem
+die Ausgabe von Zeichenketten-Konstanten m„glich sein.
+
+€nderung der Implementierung der Bezeichnertabelle  
+
+ Im PL0-System wird mit binƒren Suchen ermittelt, ob ein Bezeichner ein Schl…sselwort ist, und andernfalls linear nach einem fr…heren Eintrag
+des Bezeichners gesucht.
+
+ Dieses Verfahren ist ineffizient. In den meisten ‚bersetzern wird daher eine Streuspeicher-Verwaltung (besser bekannt als Hash-Codierung)
+eingesetzt, um den Suchaufwand zu reduzieren:
+
+ Jeder Bezeichner x wird mit einer Hash-Funktion auf ein Intervall i [1... n] abgebildet (f…r PL1 reicht n ~ 50). Ist die Stelle i leer, wird die
+Information f…r x eingetragen. Ist x an der Stelle  i bereits eingetragen, wird dieser Eintrag nochmal benutzt.  Steht an der Stelle i ein anderer
+Bezeichner, z.B. y, kollidieren diese Bezeichner bez…glich der Hash-Funktion, und es mu– ein Ausweichplatz f…r x gefunden werden, bzw.
+…berpr…ft werden, ob x bereits an einer der Ausweichstellen eingetragen ist.
+
+ Es gibt verschiedene Methoden, Kollisionen zu behandeln: Quadratisches Sondieren (quadratic hashing, siehe auch [Wir86], Abschnitt 5.3) 
+und Verweisketten (hashing and chaining, siehe auch [ASU85], Abschnitt 7.6). Beide Verfahren werden im Kurs bzw. im Praktikum behandelt.
+
+ Idealerweise soll die Hash-Funktion so geartet sein, da– alle Eintrƒge gleichverteilt sind, weil dann am wenigsten gesucht werden mu–.
+Probiert verschiedene Hash-Funktionen aus und versucht wenigstens zu erreichen, da– alle Schl…sselw„rter von PL1 verschiedene Hash-Indices
+erhalten.
+
+Erweiterung der PL1-Lexeme
+
+ Erweitert die lexikalische Analyse um die unten beschriebenen Lexeme. Bedenkt, da– der Parser diese Symbole zunƒchst ignorieren bzw.
+diese Symbole als "noch nicht implementiert" anmeckern soll. Die Zeichenketten (strings) brauchen nicht in die Hash-Tabelle eingetragen
+zu werden, weil nach ihnen nicht gesucht werden mu–. Die Zeichenpaare \n. und \t. stehen f…r Zeilenwechsel und Tabulator; und f…r alle
+anderen druckbaren Zeichen x steht \x f…r x. Mit \' und mit \\ k„nnen so das Ende-Zeichen und das Fluchtzeichen in Zeichenketten
+eingebaut werden. 
+
+Neue PL1-Lexeme 
+  
+string      ::=    "'" {StringElem} "'" | '"' {StringElem} '"'.
+
+StringElem  ::=    NoApostBack | '\' PrintChar.  
+
+Delimiter    ::=   "." | "," | ";" | "(" | ")" | ":" | "[" | "]".                  
+ 
+ReservedWord  ::=    "BEGIN" | "END" | "CONST" | "VAR" | "PROCEDURE" | "MODULE" |
+                    "TYPE" | ARRAY" | "OF" |           
+                    "CALL" | "IF" | "THEN" | "ELSE" | "ELSIF" |                    
+                    "WHILE" | "DO".
+                
+Operator    ::=   ":" | ":=" | "?" | "!" | "=" | "#" | "<" | ">" | "<=" | ">=" | "+" | "-" | "*" | "/" | "ODD" |
+                "&" | "OR" | "~".         
+            
+NoApostBack  ::=   ... {all printable characters but ', " and \}
+ 
+PrintChar    ::=   ... {all printable characters but newline}
+
+EscapedChar  ::=   "\" | "'" | """ | "n" | "t".  
+
+
+PL1-Syntax
+
+ Die Erweiterung der Syntax von PL0 ist nur winzig, aber n…tzlich: In der Ausgabeanweisung sollen au–er ganzzahligen Ausdr…cken auch
+Zeichenketten gedruckt werden k„nnen.
+  
+          "CONST" { identifier "=" ( [ "-" ] number | string ) ";" }
+
+
+              "!" ( expression | string )
+            
+
+
+ Tip: Wenn Ihr die K…r von den Aufgaben 2 und/oder 5 machen wollt, solltet Ihr schon hier die Lexeme for,  to, downto und/oder
+return und/oder len eintragen!  
+
+
+
+
+Aufgabe 2:  Syntaktische Analyse
+
+ PL1 erinnert in einigen Punkten noch an so altmodische Sprachen  wie FORTRAN (Prozeduraufruf mit call) oder PASCAL (Anweisungsfolgen
+in zusammengesetzten Anweisungen m…ssen mit begin und end geklammert werden).
+
+ Das soll im PL2-‚bersetzer besser gel„st werden. Zusƒtzlich erhƒlt die bedingte Anweisung else- und elsif-Zweige. In Bedingungen werden
+logische Operationen erlaubt.
+
+PL2-Syntax
+
+ Erweitert den Parser, so da– er die in der Anlage gegebene Syntax erkennt. Achtung, der Vorrang (priority) von logischen Operationen ist in
+der Syntax anders geregelt als in PASCAL oder Modula-2! In PL2 bindet or schwƒcher als &, und & schwƒcher als die Vergeichs-Operatoren. 
+Das spart Klammern, probiert es aus!
+
+ Auch der Scanner ƒndert sich geringf…gig: Der Bezeichner call ist kein Schl…sselwort mehr, sondern darf frei als Bezeichner vereinbart werden.
+ 
+ Erweitert die abstrakte Syntax, so da– der else-Teil und die logischen Operationen dargestellt werden k„nnen. 
+
+ Erzeugt richtigen Code f…r bedingte Anweisungen und Formeln (f…r die neuen logischen Operationen gibt es bereits geeignete Assemblerbefehle).
+
+ Beachtet, da– nun die Typen von Ausdr…cken nicht mehr so einfach bestimmt werden k„nnen, Jede Formel kann den Typ integer oder
+boolean haben. F…r jeden Operator mu– gepr…ft werden, ob seine Operanden zulƒssige Typen haben. 
+
+ Vergleichsoperatoren funktionieren auch mit logischen Operanden!
+
+
+ K…r: In Hinblick auf die in Aufgabe 4 einzuf…hrenden Felder ist die Zƒhlschleife sicherlich eine Bereicherung. Die Syntax k„nnte lauten:
+  
+statement    ::=    ...
+                | "FOR" identifier ":=" expression ("TO"|"DOWNTO") expression "DO" statements "END"
+                 ...
+
+
+
+
+Aufgabe 3: Kontext-Analyse
+
+ Die Regeln f…r die Sichtbarkeit von Vereinbarungen rufen unangenehme Erinerungen an PASCAL hervor (Stichwort : FORWARD). Dies soll in PL3
+geƒndert werden. Gleichzeitig soll die Objekttabelle so implementiert werden, da– die hƒufigsten Zugriffsoperationen in konstanter Zeit ablaufen.
+Logische Variable werden nebenbei auch noch eingef…hrt.
+
+Gitterartige Objekttabelle
+
+ Die hier skizzierte Implementierungstechnik wird in der Vorlesung behandelt; sie ist in [Wat84] eingehend beschrieben.
+
+ Die Bezeichnertabelle erhƒlt f…r jeden Bezeichner ein zusƒtzliches Feld, da– das jeweils g…ltige definierende Auftreten (defining occurrence) des
+Bezeichners enthƒlt.
+
+ Jeder Eintrag in der Objekttabelle enthƒlt:
+  
+  1. den Bezeichner (Id),
+
+  2. seinen Level,
+
+  3. einen Verweis auf seine nƒchst-globale Vereinbarung und
+
+  4. einen Verweis auf die nƒchste Objektvereinbarung im selben Block.
+
+ Alle weitern Eintrƒge sind f…r die Verwaltung der ObjektTabelle selbst ohne Belang und werden den Knoten bei Bedarf durch Typerweiterung
+hinzugef…gt. Dazu geh„ren insbesondere:
+
+  5. seine Art (kind), also const bis proc,
+
+  6. sein Typ bool oder int).
+
+ Diese Tabelle wird mit folgenden Operationen verwaltet:
+
+ EnterBlock
+  schafft einen Zeiger auf eine (leere) Kette von lokalen Vereinbarungen und erh„ht den Level.
+
+ EnterObject( obj )
+  pr…ft ob noch kein Objekt mit der selben Id auf dem aktuellen Level vorhanden ist und f…gt das Objekt ein. Andernfalls wird eine
+  Fehlermeldung ausgegeben.
+
+ FindDecl( Id )
+  liefert das Objekt mit dem Namen 'Id' oder NIL.
+
+ LeaveBlock
+  l„scht die lokalen Vereinbarungen und macht ggf. die dadurch verdeckten globalen Vereinbarungen der Bezeichner wieder sichtbar.
+
+ F…r jedes angewandte Auftreten (applied occurrence) eines Bezeichners kann so bei der Kontext-Analyse ein Verweis auf die dazugeh„rige
+Vereinbarung eingetragen werden (Der Baum wird damit zum azyklischen Graphen!).
+
+
+Geƒnderte Kontextbedingungen  
+
+ Die (kontext-freie) Syntax wird in dieser Aufgabe nur geringf…gig geƒndert.
+
+ Es ƒndern sich jedoch die Kontextbedingungen.
+
+ Zum Einen betrifft das die Typregeln:
+
+  - integer und boolean sind die einzigen vordefinierten Bezeichner f…r Typen.
+    
+  - Wahrheitswerte sind die vordefinierten Konstanten true und false.
+    
+  - Die Variablen m…ssen ihrem Typ entsprechend verwendet werden. 
+       Beispielsweise m…ssen  in der Anweisung
+      
+       a := b & i+1 > j;
+         
+        i und j den Typ integer, a und b den Typ boolean haben.
+
+ Die aufwendigste Erweiterung von PL3 ist jedoch die Verallgemeinerung der Sichtbarkeitsregeln.
+
+ In PL2 gilt, wie in PASCAL, die lineare Sichtbarkeit f…r Bezeichner: Jeder in einem Block vereinbarte Bezeichner darf nur zwischen seiner
+Vereinbarung und dem Blockende verwendet werden. Dies f…hrt dazu, da– Prozeduren nicht verschrƒnkt rekursiv definiert werden k„nnen
+(Der Ausweg in PASCAL hei–t forward).
+
+ Wir wollen eine allgemeinere und unserer Ansicht nach einsichtigere L„sung wƒhlen, die wir simultane Sichtbarkeit nennen: Jeder in einem
+Block vereinbarte Bezeichner soll …berall im Block verwendet werden d…rfen.
+
+ Deshalb braucht man in PL3 zwei Lƒufe …ber das Programm, um die Vereinbarungen abzuarbeiten:
+
+ Zunƒchst m…ssen die Konstanten, Variablen und Prozedurk„pfe eingetragen werden.
+
+ Dann erst k„nnen die Prozedurr…mpfe bearbeitet werden, weil darin ja alle in dem Block vereinbarte Bezeichner verwendet werden d…rfen.
+[In PL4 m…ssen dann vor diesen Lƒufen noch die Typen eingetragen werden.]
+
+Tip: Vordefinierte Bezeichner unterscheiden sich von Schl…sselw„rtern dadurch, da– sie durch neue Vereinbarungen …berdeckt werden k„nnen; so ist z. B. die folgende Vereinbarung zulƒssig :
+
+    var boolean, true, false: integer;
+ 
+
+K…r: keine, denn diese Aufgabe ist sowieso schon umfangreich.
+
+
+
+
+Aufgabe 4:  Felder
+
+  Eine richtige Programmiersprache braucht zusammengesetzte Datenstrukturen. PL4 erhƒlt deshalb  exemplarisch Felder, weil die f…r die Codeerzeugung am interessantesten sind.
+
+Spracherweiterung
+
+  F…hrt Felder nach unten beschriebener Syntax ein.  Erlaubt Typvereinbarungen.
+
+PL4-Syntax
+
+declaration  ::=    ...
+                 |  "TYPE" identifier "=" type ";".  
+               
+type      ::=   identifier                               
+                |  "ARRAY" number "OF" type.              
+      
+statement    ::=   [ denotation ":=" formula            
+                  ... 
+                  ]
+                            
+factor      ::=   denotation                          
+                  | number
+                  | ("ODD"|"~") factor   
+                  | "(" formula ")" .
+            
+denotation   ::=   identifier {"[" expression "]"}. 
+
+PL4-Kontextbedingungen
+
+ Jede Typvereinbarung
+  
+      type A = B
+      
+f…hrt ein neues Synonym f…r den gleichen Typ ein. Objekte der Typen A und B  sind zuweisungsvertrƒglich! Vereinbarungen von Feldtypen
+wie etwa
+
+    type C = array 10 of integer; 
+    type D = array 10 of integer
+    
+f…hren stets neue Typen ein, auch wenn die Typen gleiche Elementtypen, Dimension und Lƒnge haben. Objekte der Typen C und D  sind
+also nicht zuweisungsvertrƒglich! Rekursive Typvereinbarungen wie diese sind verboten:
+
+    type Nett = array 2 of Nett; 
+    type Garstig = array 2 of Haesslich; 
+     ... 
+    type Haesslich = array 2 of Garstig;
+
+Feldelemente sind numeriert von 0 ... n-1, wobei die Zahl n gr„–er als 0 sein mu–.
+
+
+
+
+
+
+Aufgabe 5:  Prozeduren mit Parametern
+
+ Prozeduren ohne Parameter sind nicht sehr sinnvoll. PL5 lƒ–t deshalb Wert- und Referenz-Parameter zu.
+
+Spracherweiterung
+
+ F…hre Parameter nach unten beschriebener Syntax ein. 
+
+PL5-Syntax
+
+declaration  ::=    ...              
+                   |  "PROCEDURE" identifier [ parameters ] ";" block ";"
+                   |  ...
+               
+parameters  ::=   "(" parameter {";" parameter} ")".  
+
+parameter    ::=   ["VAR"] identifier {"," identifier} ":" identifier. 
+
+statement    ::=   [  access ":=" formula                                    
+                  | identifier [ actuals ]             
+                  ...         
+                ].
+          
+actuals ::=   "(" formula {"," formula} ")".     
+  
+PL5-Kontextbedingungen
+
+ F…r VAR-Parameter mu– beim Aufruf als aktueller Parameter eine Variable eingesetzt werden. Sonst gelten die Regeln von PASCAL.
+  
+ K…r: F…hrt Funktionsprozeduren ein wie in Modula-2. Die Syntax von Vereinbarungen, Anweisungen und Ausdr…cken m…–te dann um
+Funktions-Prozeduren, R…ckkehr-Anweisung bzw. Funktionsaufruf erweitert werden und k„nnte z.B. lauten:
+
+declaration  ::=    ...              
+            |  "PROCEDURE" identifier [ parameters ] [":" type] ";" 
+
+statement    ::=   [  ...
+              | "RETURN"  [formula]
+                ].
+
+factor      ::=    ...
+               |  identifier [actuals]
+       
+ ‚berlegt, ob ihr nicht auch erlauben wollt, da– Funktionsprozeduren Felder als Ergebnisse liefern, denn dies ist ebenfalls nicht schwierig.
+
+ Erlaubt uneingeschrƒnkte Felder ("unconstrained arrays") als Parameter von Prozeduren. Die Syntax m…–te dann lauten:
+  
+parameter    ::=   ["VAR"] identifier {"," identifier} ":" formaltype.
+
+formaltype  ::=   identifier
+                  | "ARRAY" "OF" formaltype.  
+
+ Wenn f…r einen Parameter ein Feldtyp angegeben wird, etwa
+ 
+   procedure FeldDruck( f: array of integer );
+   
+soll dies so aufgefa–t werden, da– die Prozedur FeldDruck mit beliebigen aktuellen Parametern vom Typ array of integer aufgerufen werden
+kann. Zur Bestimmung der jeweiligen oberen Grenze eines offenen Feldes soll eine Operation len implementiert werden (die f…r jeden Feldtyp
+funktioniert). Wenn f als
+
+  var f: array 10 of array 20 of integer;
+
+vereinbart ist, soll len f den Wert 10, und len f[i] (f…r i = 1...10) den Wert 20 liefern.
+  
+ Damit kann man allgemeine Prozeduren f…r Felder schreiben, zum Beispiel den Rumpf der oben angefangenen Prozedur so vervollstƒndigen:
+ 
+   procedure FeldDruck( f: array of integer );
+   var i: integer;
+   begin  i := 0;
+     while i < len f do
+       ! f[i];  i := i+1
+     end
+   end FeldDruck;
+
+ Diese Erweiterung hat erhebliche Auswirkungen auf die Speicherorganisation. Bisher wurden alle Objekte x im jeweiligen lokalen Datenbereich
+an der Adresse 
+  
+    base( x.level ) + x.offset
+    
+angelegt. Ist x ein unbeschrƒnktes Feld, wird an dieser Stelle nur ein Verweis auf die Anfangsadresse der Elemente abgespeichert, zusammen
+mit den aktuellen Lƒngen f…r alle Dimensionen (ein sogenannter Feld-Deskriptor). Die Elemente selbst werden in einem Datenbereich …ber
+dem lokalen Datenbereich f…r Objekte fester Lƒnge abgespeichert. Der Anfang der Elemente von x findet sich also an der Adresse
+
+    stack[ base( x.level ) + x.offset ]
+    
+Vgl. [WM92] f…r weitere Details.
+
+
+
+
+Literatur
+
+
+[ASU85]
+Ravi Sethi, Alfred V. Aho, Jeffrey D. Ullman: Compiler Construction: Principles, Methods, and Tools Addison Wesley, Reading MA (1985). Deutsch (in ‚bersetzung von G. Barth und Mitarbeitern) als: Compilerbau (2 Bƒnde) bei Addison-Wesley, Bonn(1988)
+
+[Wat84]
+D.A. Watt: Contextual Analysis In: B. Lorho (ed.): Compiler Construction: Methods and Tools, Cambridge University Press, (1984)
+
+[WM92]
+Reinhard Wilhelm, Dieter Maurer: ‚bersetzerbau: Theorie, Konstruktion, Generierung.
+Springer-Lehrbuch, Springer, Berlin Heidelberg New York (1992)
+
+[Wir86]
+Niklaus Wirth: Algorithmen und Datenstrukturen mit Modula-2. 4. Auflage.
+Teubner, Stuttgart  (1986)
+
+[Wir77]
+Niklaus Wirth: Compilerbau. Teubner Studienbuecher (1977)
+
+[Wir96]
+Niklaus Wirth: Grundlagen und Techniken des Compilerbaus. Addison-Wessley (1996)

@@ -1,0 +1,335 @@
+Colors:
+  red: new
+  blue: different
+
+
+PL0 Syntax:
+
+program    ::=  module ientifier block ".".
+
+block      ::=  declarations begin statements end identifier.
+
+declarations  ::=  [ const { identifier "=" [ "-" ] number ";" } ]
+                   [ var { identifier {"," identifier} ":" identifier ";" } ]
+                   { procedure identifier ";" block ";". }.
+                             
+
+statements    ::=  statement { ";" statement }.
+            
+statement    ::= [  ident ":=" expression
+                  | call identifier
+                  | "?" identifier
+                  | "!" expression
+                  | begin statements end
+                  | if condition then statement
+            | while condition do statement
+                ].
+             
+condition    ::=  odd expression
+          | expression ("="|"#"|"<"|">"|"<="|">=") expression .
+          
+expression    ::=  [ "+" | "-" ] term { ( "+" | "-" ) term }.
+
+term      ::= factor { ( "*" | "/" ) factor }.
+
+factor      ::= identifier | number | "(" expression ")" .
+              
+predefined identifier:  integer
+     
+
+-------------------------------------------------------------------------------------
+
+PL1 Syntax:
+
+program    ::= module ientifier block ".".
+
+block      ::= declarations begin statements end identifier.
+
+declarations  ::= [ const { identifier "=" ( [ "-" ] number | string ) ";" } ]
+                   [ var identifier {"," identifier} ":" identifier ";" ]
+                   { procedure identifier ";" block ";" }.
+                
+statements  ::= statement { ";" statement }. 
+          
+statement    ::= [  identifier ":=" expression
+                  | call identifier
+                  | "?" identifier
+                  | "!" ( expression | string )      
+                  | begin statements end
+                  | if condition then statement                        
+                  | while condition do statement
+                ].
+             
+condition    ::= expression ("="|"#"|"<"|">"|"<="|">=") expression
+             | odd expression.
+          
+expression    ::= ["+"|"-"] term { ( "+" | "-" ) term }.
+
+term      ::= factor { ("*"|"/") factor}.
+
+factor      ::= identifier |  number | "(" expression ")".
+              
+predefined identifier:  integer
+    
+
+-------------------------------------------------------------------------------------
+
+PL2 Syntax:
+
+program    ::= module ientifier block ".".
+
+block      ::= declarations begin statements end identifier.
+ 
+declarations  ::= [ const { identifier "=" ( [ "-" ] number | string ) ";" } ]
+                   [ var identifier {"," identifier} ":" identifier ";" ]
+                   { procedure identifier ";" block ";" }.
+              
+statements  ::= statement { ";" statement }. 
+          
+statement    ::= [  identifier ":=" formula
+                  | identifier   
+                  | "?" identifier
+                  | "!" (formula | string)
+                  | if formula then statements              
+                       { elsif formula then statements }
+                       [ else statements ]              
+                        end
+                  | while formula do statements end              
+                ]. 
+             
+formula    ::= conjunction { or conjunction }. 
+
+conjunction  ::= relation { "&" relation }.    
+
+relation    ::= expression [ ("="|"#"|"<"|">"|"<="|">=") expression ].
+          
+expression    ::= ["+"|"-"] term { ( "+"|"-" ) term }.
+
+term      ::= factor { ( "*" | "/" ) factor }.
+ 
+factor      ::= identifier
+                  | number
+                | ( odd | "~" ) formula        
+                | "(" formula ")".              
+
+predefined identifiers:  integer, boolean, true, false
+
+-------------------------------------------------------------------------------------
+
+PL3 Syntax:
+
+
+program    ::= module ientifier block ".".
+
+block      ::= { declaration} begin statements end identifier.
+ 
+declaration    ::= const { identifier "=" ( [ "-" ] number | string ) ";" }
+                | var { identifier { "," identifier } ":" type ";" }
+                   | procedure identifier ";" block ";".
+              
+type      ::= identifier; 
+                     
+statements    ::= statement { ";" statement }. 
+          
+statement    ::= [  identifier ":=" formula                              
+                  | identifier 
+                  | "?" identifier
+                  | "!" (formula | string)
+                  | if formula then statements                          
+                      { elsif formula then statements }
+                      [ else statements ]
+                     end                        
+                  | while formula do statements end     
+                ].
+          
+formula     ::=   conjunction { or conjunction }.
+
+conjunction   ::=   relation { "&" relation }. 
+
+relation     ::=   expression [ ("="|"#"|"<"|">"|"<="|">=") expression ].
+          
+expression    ::=   [ "+" | "-" ] term { ( "+" | "-" ) term }.
+
+term       ::=   factor { ( "*" | "/" ) factor }.
+
+factor       ::=   identifier
+                | number
+                | ( odd | "~" ) formula 
+                | "(" formula ")".
+     
+predefined identifiers: integer, boolean, true, false
+
+-------------------------------------------------------------------------------------
+     
+
+PL4 Syntax:
+
+program    ::= module ientifier block ".".
+
+block      ::= { declaration } 
+          begin statements end identifier.
+            
+declaration    ::= const { identifier "=" ( [ "-" ] number | string ) ";" }
+          | type { identifier "=" type ";" }
+                   | var { identifier { "," identifier} ":" type ";" }
+                   | procedure identifier ";" block ";".
+               
+type      ::= identifier | array of type. 
+
+range      ::= number | identifier.   
+      
+statements    ::= statement { ";" statement }. 
+          
+statement    ::= [  denotation ":=" formula      
+                  | identifier 
+                  | "?" denotation
+               | "!" ( formula | string )
+                | if formula then statements                          
+                  { elsif formula then statements }
+                    [ else statements ]
+                   end                      
+                 | while formula do statements end     
+             ].
+          
+formula    ::= conjunction { or conjunction }.     
+                   
+conjunction  ::= relation { "&" relation }. 
+
+relation    ::= expression [("="|"#"|"<"|">"|"<="|">=") expression] .
+          
+expression  ::= ["+"|"-"] term { ("+"|"-") term } .
+
+term      ::= factor { ("*"|"/") factor} .
+
+factor      ::= denotation                              
+              | number
+          | ( odd | "~" ) formula                     
+             | "(" formula ")".
+            
+denotation    ::= identifier [ "[" expression { "," expression } "]" ].   
+
+predefined identifiers: integer, boolean, true, false
+
+
+-------------------------------------------------------------------------------------
+  
+
+PL5 Syntax:
+
+program    ::= module ientifier block ".".
+
+block      ::= { declaration } 
+          begin statements end identifier.
+ 
+declaration    ::= const { identifier "=" ( [  "-" ] number | string ) ";" }
+          | type { identifier "=" type ";" }
+                   | var { identifier {"," identifier} ":" type ";" }
+                   | procedure identifier [ parameters ] ";" block ";",
+               
+parameters    ::= "(" parameter { ";" parameter} ")". 
+
+parameter    ::= [var] identifier { "," identifier } ":" identifier. 
+
+type      ::= identifier | array range of type.  
+
+range      ::=   number | identifier.
+
+statements    ::= statement { ";" statement }. 
+          
+statement    ::= [  denotation ":=" formula                                              
+                  | identifier [ actuals ]      
+                  | "?" denotation
+                  | "!" (formula | string )
+                  | if formula then statements                          
+                       { elsif formula then statements }
+                    [ else statements ]
+                        end                       
+                  | while formula do statements end        
+                ].
+          
+actuals      ::= "(" formula {"," formula} ")".    
+             
+formula    ::= conjunction { or conjunction }. 
+
+conjunction  ::= relation { "&" relation }. 
+
+relation    ::= expression [ ("="|"#"|"<"|">"|"<="|">=") expression ].
+          
+expression    ::= [ "+" | "-" ] term { ( "+" | "-" ) term } .
+
+term      ::= factor { ( "*" | "/" ) factor }.
+
+factor      ::= denotation
+                  | number
+                  | ( odd | "~" ) formula                   
+                  | "(" formula ")".
+            
+denotation    ::= identifier [ "[" expression { "," expression } "]" ].
+
+
+predefined identifiers:  integer, boolean, boolean, false
+
+
+-------------------------------------------------------------------------------------
+
+
+PL6 Syntax:
+
+
+{PL5 mit allen vorgeschagenen K…r Elementen}
+
+program    ::= module ientifier block ".".
+
+block      ::= { declaration } 
+          begin statements end identifier.
+ 
+declaration    ::= const { identifier "=" ( [  "-" ] number | string ) ";" }
+          | type { identifier "=" type ";" }
+                   | var { identifier {"," identifier} ":" type ";" }
+                   | procedure identifier [ parameters ] [":" type] ";" block ";"  {K…r Aufgabe 5}         
+               
+parameters   ::= "(" parameter {";" parameter} ")".
+
+parameter     ::= [var] identifier {"," identifier} ":" formaltype.  {K…r Aufgabe 5}
+
+formaltype   ::= identifier | array of identifier.  
+
+type      ::= identifier | array range of type.  
+        
+range      ::=  number | identifier.
+
+statements    ::= statement { ";" statement }. 
+          
+statement    ::= [  denotation ":=" formula
+                  | identifier [ actuals ]
+                  | return [formula]                   {K…r Aufgabe 5}
+                  | "?" denotation
+                  | "!" (formula | string )
+                  | if formula then statements                          
+                       { elsif formula then statements }
+                       [ else statements ]
+                        end                       
+                  | while formula do statements end       
+                  | for identifier ":=" expression ( downto | to ) expression do statements end {K…r Aufgabe 2}
+                ].
+          
+actuals      ::= "(" formula {"," formula} ")".
+             
+formula      ::= conjunction { or conjunction }. 
+
+conjunction  ::= relation { "&" relation }. 
+
+relation    ::= expression [("="|"#"|"<"|">"|"<="|">=") expression ] .
+          
+expression    ::= ["+"|"-"] term { ("+"|"-") term } .
+
+term      ::= factor { ( "*" | "/" ) factor } .
+
+factor       ::= denotation
+                  | number
+                  | ( odd | "~" ) formula
+                  | len denotation             {K…r Aufgabe 5}
+                  | "(" formula ")".
+            
+denotation  ::= identifier [ "[" expression { "," expression } "]" ].
+

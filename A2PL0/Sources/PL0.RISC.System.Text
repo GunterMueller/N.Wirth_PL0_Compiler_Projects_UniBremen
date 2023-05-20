@@ -1,0 +1,302 @@
+
+PL0-Compiler und RISC-System
+
+Berthold Hoffmann
+G…nter Feldmann 
+Studiengang Informatik
+Universitƒt Bremen
+Januar 2003
+
+
+
+Inhalt
+
+1      Einf…hrung    
+
+2      Die Programmiersprache PL0        
+  2.1      Syntax  
+  2.2      Kontext-Bedingungen
+  2.3      Semantik
+
+3      PL0-Compiler und RISC-Interpreter
+  3.1      Syntaxanalyse
+    3.1.1    Lexikalische Analyse
+    3.1.2    Syntaktische Analyse
+    3.1.3    Der abstrakte Syntaxbaum
+  3.2     Semantische Analyse
+  3.3      Code-Erzeugung
+  3.4      Zielsprache  und Interpreter
+
+
+1  Einf…hrung
+  
+ Das PL0-System besteht aus einem ‚bersetzer f…r die PASCAL-ƒhnliche Programmiersprache PL0 in die Maschinensprache eines abstrakten Prozessors RISC, und einem Emulator f…r den Prozessor RISC.
+
+ Das PL0-System wurde von Niklaus Wirth f…r sein Lehrbuch Compilerbau (Wirth 1986) entwickelt. Das System wurde urspr…nglich
+in PASCAL geschrieben. Inzwischen ist das System stark …berarbeitet und zunƒchst auf Modula-2 und spƒter auf Oberon …bertragen
+worden. Dabei wurde der ein-Phasen Compiler in einen mehr-Phasen Compiler mit Zwischenspeicherung in einem sogenannten
+Syntaxbaum …berf…hrt. Oberon ist eine ebenfalls von Niklaus Wirth entworfene objekt-orientierte Sprache in der Nachfolge von
+Pascal und Modula-2 (siehe Wirth 1988). Der RISC Emulator wurde dem Buch Grundlagen und Techniken des Compilerbaus
+(Wirth 1996) entnommen.
+
+ In diesem Papier werden die Programmiersprachen PL0 und der RISC Interpreter beschrieben und der Aufbau des Systems erlƒutert.
+
+2  Die Programmiersprache PL0
+  
+ PL0 ist eine winzige Teilsprache von PASCAL, mit einigen Abweichungen in der Notation. Die Sprache wurde so entworfen, dass in
+einer m„glichst kleinen Programmiersprache m„glichst viele typische Fragestellungen des ‚bersetzerbaus behandelt werden k„nnen.
+Es ist also nicht verwunderlich, wenn das Programmieren in PL0 etwas umstƒndlich ist. Das macht aber auch nichts, denn es sollen
+keine grossen Programme in PL0 geschrieben werden. 
+
+2.1  Syntax
+
+ Ein PL0-Programm ist ein Block, der aus Vereinbarungen (declarations) und einer Folge von Anweisungen (statements) besteht.
+Als Objekte k„nnen ganzzahlige Variable, Konstanten und Prozeduren (ohne Parameter) vereinbart werden, deren R…mpfe lokale
+Vereinbarungen enthalten k„nnen.
+
+ PL0 enthƒlt einige typische Anweisungen von imperativen Sprachen: Wertzuweisung, Lese- und Schreib-Anweisung,
+Verbund-Anweisung, einfache bedingte Anweisung, Wiederholungsanweisung und Prozeduraufruf.
+
+ Im wesentlichen wird die Notation von PASCAL verwendet; f…r die Eingabe und Ausgabe werden jedoch die Operatoren ? bzw. !
+benutzt, und ein Prozeduraufruf beginnt mit dem Schl…sselwort call.
+
+ Bedingungen (conditions) k„nnen mit den …blichen Vergleichsoperationen aufgebaut werden und in bedingten oder
+Wiederholungs-Anweisungen verwendet werden.
+
+ Ausdr…cke (expressions) sind geschachtelte ganzzahlige Formeln …ber Bezeichnern (identifiers), Zahlen, und den gelƒufigen
+arithmetischen Operationen auf ganzen Zahlen.
+
+ Abbildung 1 zeigt die kontext-freie Syntax von PL0 in erweiterter Backus-Naur-Form.
+
+ Abbildung 2 zeigt ein Programm f…r die Berechnung des gr„ssten gemeinsamen Teilers zweier Zahlen, das die M„glichkeiten
+und Grenzen von PL0 aufzeigt (die hier und im folgenden fett und klein geschriebenen Schl…sselworte m…ssen im PL0-System
+GROSS eingegeben werden).
+
+2.2  Kontext-Bedingungen
+
+ Jede Vereinbarung bindet einen Bezeichner an ein Objekt (eine Konstante, Variable oder Prozedur). Jeder Bezeichner darf in den
+Vereinbarungen eines Blocks h„chstens einmal gebunden werden.
+
+ Der G…ltigkeitsbereich einer solchen Bindung erstreckt sich vom Anfang der Vereinbarung bis zum Ende des Blocks, ohne die
+G…ltigkeitsbereiche aller Vereinbarungen desselben Bezeichners in lokalen Bl„cken (Verdeckung, hiding).
+  
+ Die G…ltigkeit eines Bezeichners erstreckt sich also jeweils von der Vereinbarung bis zum Ende des die Vereinbarung umgebenden
+Blocks (lineare Sichtbarkeit).
+
+  Jeder in einer Anweisung benutzte Bezeichner muss eine g…ltige Vereinbarung haben.
+
+  Jeder Bezeichner muss gemƒss seiner g…ltigen Vereinbarung verwendet werden, 
+  und zwar als
+  - Prozedur, wenn er in einem Prozedur-Aufruf verwendet wird,
+  - als Variable, wenn er auf der linken Seite einer Zuweisung oder in einem Lesebefehl
+     benutzt wird, und
+  - als Variable oder Konstante, wenn er in einem Ausdruck, in einer Bedingung oder in
+     einem Schreibbefehl benutzt wird.
+
+2.3  Semantik
+
+ Die Bedeutung von PL0-Programmen ist ebenfalls an PASCAL orientiert; da die intuitiv hinreichend klar sein d…rfte, wird hier auf
+eine genaue Definition verzichtet. 
+
+
+3  Der PL0-Compiler
+
+ Das System arbeitet in vier Phasen:
+
+ Die Syntaxanalyse stellt sicher, dass das eingegebene Programm den strukturellen Regeln der Sprache PLx gen…gt und produziert
+einen abstrakten Syntaxbaum.
+
+ Die semantische Analyse wird durch Aufruf der Methode Analyse des Wurszelknotens gestartet. Sie durchlƒuft den
+gesamten Baum, …berpr…ft die Kontextbedingungen und berechnet die Adressen von Variablen.
+
+ Die Code-Erzeugung wird durch Aufruf der Methode Synthesize des Wurzelknotens gestartet. Sie durchlƒuft ebenfalls den
+gesamten Baum und erzeugt Code f…r den abstrakten RISC Prozessor.
+
+ Der RISC Emulator f…hrt das …bersetzte Programm mit den Eingabedaten aus.
+
+ Die Aufteilung in Phasen mag in Hinblick auf die Einfachheit von PL0 …bertrieben erscheinen; in Wirth (1986) wird der ‚bersetzer
+in einem einzigen Durchgang realisiert (single pass). Unsere Implementierung soll eine spƒtere Erweiterung des ‚bersetzers
+erleichtern. 
+
+ Der abstrakte Syntaxbaum und der erzeugte Code werden im Hauptspeicher gehalten und der fertige Code wird in die Datei
+RISC.code augelagert.
+
+3.1  Syntaxanalyse
+
+ Die Analyse ist, wie …blich, weiter unterteilt in
+ 
+    - lexikalische Analyse (PL0Scanner) und
+    - syntaktische Analyse (PL0Parser)
+
+ Die Syntaxanalyse verwendet noch einige weitere Moduln:
+ 
+    - f…r die Fehlerausgabe und die erstellung von Trace-Views (PL0Global) ,
+    - Die Bezeichner-Verwaltung (PLOIdentifierTable) speichert die Bezeichner.
+
+ Sehr wichtig sind ausserdem die Module des Syntaxbaums. Der ist aber sowohl Teil der Kontextanalyse als auch der Synthese
+und wird deshalb weiter unten beschrieben.
+
+3.1.1  Lexikalische Analyse
+
+ Die lexikalische Analyse hat die Aufgabe, den Zeichenstrom eines PL0-Programms zu Lexemen (oder Symbolen) zusammenzufassen.
+
+ Die lexikalischen Konventionen von PL0 sind im einzelnen:
+      
+  - Leerzeichen (space characters), Tabulatorzeichen (tab stops) und Zeilenenden 
+     (newline characters) trennen Lexeme voneinander, werden aber ansonsten …berlesen.
+      
+  - Kommentare werden wie in PASCAL mit den Zeichen (* und *) eingeschlossen und 
+     k„nnen sich …ber mehrere Zeilen erstrecken, d…rfen aber nicht geschachtelt werden.
+      
+  - Zahlen sind Folgen von Ziffern.
+      
+  - Grosse und kleine Buchstaben werden unterschieden, d.h. ABEND, abend, aBeNd
+     und Abend sind verschiedene Bezeichner.
+      
+  - Die folgenden Bezeichner sind reservierte Schl…sselworte (reserved words) und 
+     d…rfen nicht f…r die Vereinbarung von  Objekten verwendet werden: 
+     
+    begin   call   const   do   end   if   odd   procedure   then   var   while
+   
+  - Die folgenden Zeichen Komma, Semikolon, Punkt, und die runden Klammern sind 
+     Trennzeichen (delimiters):
+     
+         ,   :   ;   .   (   )   
+
+  - Die folgenden Zeichen und Zeichenfolgen sind Operationssymbole:
+
+         :=   ?   !   =   #   <   >   <=   >=   +   -   *   /
+
+ Die lexikalische Struktur von Zahlen, Bezeichnern und Kommentaren wird in Abbildung 3  mit regulƒren Ausdr…cken beschrieben
+(not x beschreibt alle Zeichen auser x).
+
+3.1.2  Syntaktische Analyse 
+
+ Die syntaktische Analyse erkennt, ob ein Programm nach der in Abbildung 2 angegebenen Syntax aufgebaut ist und meldet andernfalls Fehler. Sie ist nach der Methode des rekursiven Abstiegs systematisch aus der Grammatik abgeleitet worden.
+
+3.1.3  Der abstrakte Syntaxbaum
+
+ Ein Syntaxbaum spiegelt die strukturelle Gliederung eines PL0-Programms wieder, wie sie von der syntaktischen Analyse erkannt
+wird. Dabei wird so weit wie m„glich von der konkreten Syntax abstrahiert: alle Teile der Syntax, die lediglich der eindeutigen
+Erkennung eines Programms dienen (wie Trennzeichen und syntaktische Klammern) werden eliminiert. 
+
+ Die Modulen des Syntaxbaums definieren eine Menge von Knoten-Objekten mit jeweils einer Methode f…r die Analyse und die
+Codeerzeugung.
+
+3.2  Semantische Analyse
+
+ Die semantische Analyse (tree.Analysise) besteht aus einem einfachen Lauf …ber den Baum, in dem die Kontextbedingungen
+von PL0 …berpr…ft werden und die Adressen der Objekte berechnet werden. Auch die Analyse benutzt einen Hilfsmodul 
+(ObjectTable), der die Vereinbarungen von Bezeichnern f…r die Kontextanalyse verwaltet, und deren Adressen f…r die
+Codeerzeugung abspeichert.
+
+3.3  Code-Erzeugung
+
+ Die Code-Erzeugung (tree.Synthesize) durchlƒuft den von der semantischen Analyse …berpr…ften und um Adress-Informationen
+in der Objecttabelle ergƒnzten Baum ein weiteres Mal und erzeugt dabei Code f…r die Zielmaschine in einem Array das dann in die
+Datei RISC.code ausgegeben wird. Mit Hilfe des Kommandos RISCSystem.Decode kann man diesen Code in einer Assembler
+ƒhnlichen Notation anzeigen lassen und mit RISCSystem.Execute wird er f…r die Interpretation in den Speicher des RISC
+Emulators geladen und die Ausfuehrung gestartet.
+  
+3.4  Zielsprache und Interpreter
+
+ Die Zielprache besteht aus Maschineninstruktionen f…r den abstrakten Prozessor RISC. Dieser 32 bit RISC Prozssor wird von dem
+Modul RISC.Mod emuliert. Zum Starten der Programmausf…hrung dient das Kommando RISCSystem.Execute. Neben dem
+Kommando fuer die Programmausf…hrung enthƒlt der Modul noch weitere Kommandos die ein einfaches Debugging erm„glichen:
+
+  
+  RISCSystem.SetBreakpoint  Breakpoint setzen
+  RISCSystem.Step          eine einzelne Instruktion ausf…hren
+  RISCSystem.Continue      Fortfahren mit der Proframmausf…hrung
+  RISCSystem.Break        Unterbrechung von Endlosschleifen
+  RISCSystem.ShowMem    Anzeigen von Speicherinhalten
+  
+  
+Quellen
+
+N. Wirth: 
+  Compilerbau. 4. durchgesehene Auflage. Teubner  (1986).
+N. Wirth: 
+  The Programming Language Oberon.  Software - Practice and Experience 18(7), 671-690, (1988).
+M. Reiser, N. Wirth:    
+  Programming in Oberon: Steps Beyond Pascal and Modula. ACM Press, Addison-Wesley,  (1992).
+N. With, J. Gutknecht:  
+  Project Oberon, The Design of an Operating System and Compiler, Addison-Wesley (1992)
+N. Wirth:  
+  Grundlagen und Techniken des Compilerbaus, Addison-Wesley (1996)
+
+
+Abbildung 1:  Syntax von PL0
+
+  program ::=
+      module ident block ident . 
+  
+  block ::=   
+      declarations
+      begin
+        statement { ; statement }
+      end
+      
+  declarations ::=
+      [ const  ident = number  { , ident = number } ; ] 
+       [  var  ident { , ident } :  ident ; ]
+       {  procedure  ident ; block ident ; }
+       
+  statement ::=  
+      [   ident := expression
+        |  call ident
+        |  ? ident
+        |  ! expression
+        |  begin statement  { ; statement } end
+        |  if  condition  then  statement
+        |  while  condition  do  statement
+      ]
+      
+  condition ::=
+      odd expression
+       | expression ( = | # | < | > | <= | >= ) expression
+       
+  expression  ::=  
+      [ + | - ]  { term ( + | - ) } term
+  
+  term ::=  
+      { factor ( * | / ) } factor
+  
+  factor ::=  
+      ident | number| ( expression )  
+
+    
+
+Abbildung 2:  PL0-Programm f…r den  gr„ssten gemeinsamen Teiler
+
+      (* groesster gemeinsamer Teiler *)
+      module GGT;
+      var x, y: integer;
+      begin 
+        ? x; ? y; 
+        if x > 0 then 
+          if y > 0 then
+          begin
+            ! x ; ! y;
+            while x # y do 
+            begin 
+              if x < y then y := y - x;
+              if x > y then x := x - y
+            end
+          end
+        ! x
+      end GGT. 
+
+
+Abbildung 3:  Lexikalische Struktur von PL0
+
+  number ::= digit { digit }
+
+  ident ::= letter { letter | digit }
+  
+  letter ::=  a | b | c   ...    x | y | z | A | B | C   ...  X | Y | Z
+      
+  digit ::= 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+  
+  comment ::= (*   { not *) }   *) 
+

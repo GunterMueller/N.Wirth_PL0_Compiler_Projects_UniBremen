@@ -1,0 +1,41 @@
+SolarisA2 Gen. 64-bit, rev.9799
+X11 Display depth = 24
+OpenType 0.45 BBPort /3.12.2004  eos, pl
+Sharpening font contours: TRUE
+WindowManager: 32-bit color
+WindowManager: Display resolution: 1664x1018x32
+DisplayRefresher installed.
+Autostart: executing FileTrapWriter.Install
+Autostart: executing WMTrapWriter.Install
+{P cpuid= 0, pid= 26 Events: System event log started.}
+WMMacros: Macro file Macros.XML loaded.
+Autostart: executing UpTime.Install
+Uptime monitor started.
+Autostart: executing Heaps.SetMetaData
+GC mode : metadata
+Autostart: executing Kernel.GC
+Autostart: executing FSTools.Mount 'Work Directory' RelativeFileSystem .
+Work Directory: mounted
+Autostart: executing FSTools.Mount 'Module Sources' RelativeFileSystem .aoshome/source
+Module Sources: mounted
+Autostart: executing FSTools.Mount 'Fonts' RelativeFileSystem .aoshome/fonts
+Fonts: mounted
+Autostart: executing StartMenu.Open
+Autostart: executing SkinEngine.Unload
+ZeroSkin already loaded
+Autostart: executing WMRestorable.Load Auto.dsk
+{P cpuid= 0, pid= 43 Starting logger}
+WMRestorable: Loading desktop from Auto.dsk...
+Autostart: executing Compiler.SetDefaultPlatform Unix64
+Autostart: executing Kernel.GC
+Autostart: executing WMTextView.EnablePiemenu
+Piemenu enabled
+Autostart: executing OberonFonts.Install
+Autostart: executing WMNavigate.Open -vs 1 0 0 Navigation:TaskList
+Autostart: executing HotKeys.Open
+HotKeys: File HotKeys.XML loaded.
+SyntaxHighlighter: Auto-loading SyntaxHighlighter.XML ... done.
+  ReleaseTree@0: error: HEADER section expected
+Cleanup
+{P cpuid= 0, pid= 68 Events: System event log shut down.}
+WindowManager: Window manager closed
