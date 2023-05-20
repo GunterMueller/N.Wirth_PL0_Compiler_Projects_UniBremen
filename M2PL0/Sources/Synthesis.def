@@ -4,8 +4,7 @@ DEFINITION MODULE Synthesis;		(* gf		1.8.88 *)
 FROM	InternalTree	IMPORT	blckPtr;
 
 
-(* EXPORT QUALIFIED SemanticError, traverse;
-*)
+EXPORT QUALIFIED SemanticError, traverse;
 
 
 

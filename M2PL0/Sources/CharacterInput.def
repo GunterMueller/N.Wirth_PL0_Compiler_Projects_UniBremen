@@ -1,8 +1,7 @@
 DEFINITION MODULE CharacterInput;
 
-(* EXPORT QUALIFIED ch, GetCh, EOF,
+EXPORT QUALIFIED ch, GetCh, EOF,
 		 currLine, currCol,endOfInput, InitInput;
-*)
 
 
 CONST EOF = 0C;
